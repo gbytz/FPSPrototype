@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DestructiblePiece.h"
-#include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -10,24 +9,17 @@ ADestructiblePiece::ADestructiblePiece()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Set the BoxComponent for collisions
-	UBoxComponent* BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
-	RootComponent = BoxComponent;
-	BoxComponent->InitBoxExtent(FVector(10.0f));
-	BoxComponent->SetSimulatePhysics(true);
-	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	// BoxComponent->SetCollisionProfileName(TEXT("DestructiblePiece"));
-
-	UStaticMeshComponent* BoxVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualBox"));
-	BoxVisual->SetupAttachment(RootComponent);
 	
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualComponent"));
+	MeshComponent->SetSimulatePhysics(true);
+	MeshComponent->OnComponentHit.AddDynamic(this, &ADestructiblePiece::OnHit);
+	RootComponent = MeshComponent;
+
 	// This use a hardcoded path for now.
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> BoxVisualAsset(TEXT("/Game/Geometry/Meshes/1M_Cube.1M_Cube"));
-	if (BoxVisualAsset.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> VisualComponentAsset(TEXT("/Game/Geometry/Meshes/1M_Cube.1M_Cube"));
+	if (VisualComponentAsset.Succeeded())
 	{
-		BoxVisual->SetStaticMesh(BoxVisualAsset.Object);
-		BoxVisual->SetRelativeLocation(FVector::ZeroVector);
+		MeshComponent->SetStaticMesh(VisualComponentAsset.Object);
 	}
 }
 
@@ -44,4 +36,10 @@ void ADestructiblePiece::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
+							  
+void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hit!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hit"));
+	Destroy();
+}
