@@ -11,6 +11,9 @@ class AFPSPrototypeGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void HandleMatchIsWaitingToStart() override;
+
 public:
 	AFPSPrototypeGameMode();
 };
