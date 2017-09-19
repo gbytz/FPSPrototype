@@ -54,4 +54,5 @@ void ADestructiblePiece::SetColor(FColor InColor)
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(MeshComponent->GetMaterial(0), nullptr);
 	DynamicMaterial->SetVectorParameterValue(FName("Base Color"), FLinearColor(InColor));
 	MeshComponent->SetMaterial(0, DynamicMaterial);
+	BaseColor = InColor;
 }

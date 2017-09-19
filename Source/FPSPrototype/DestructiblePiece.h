@@ -35,4 +35,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxComponent;
+
+	FColor BaseColor;
 };
