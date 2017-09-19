@@ -2,6 +2,7 @@
 
 #include "DestructiblePiece.h"
 #include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
 
 // Sets default values
@@ -42,4 +43,11 @@ void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 	UE_LOG(LogTemp, Warning, TEXT("Hit!"));
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hit"));
 	Destroy();
+}
+
+void ADestructiblePiece::SetColor(FColor InColor)
+{
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(MeshComponent->GetMaterial(0), nullptr);
+	DynamicMaterial->SetVectorParameterValue(FName("Base Color"), FLinearColor(InColor));
+	MeshComponent->SetMaterial(0, DynamicMaterial);
 }
