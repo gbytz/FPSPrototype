@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "DestructiblePiece.generated.h"
 
 UCLASS()
@@ -30,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* MeshComponent;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* BoxComponent;
 };

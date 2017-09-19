@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DestructiblePiece.h"
-#include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -10,7 +9,7 @@ ADestructiblePiece::ADestructiblePiece()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualComponent"));
 	MeshComponent->SetSimulatePhysics(true);
 	MeshComponent->OnComponentHit.AddDynamic(this, &ADestructiblePiece::OnHit);
@@ -22,6 +21,11 @@ ADestructiblePiece::ADestructiblePiece()
 	{
 		MeshComponent->SetStaticMesh(VisualComponentAsset.Object);
 	}
+
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapComponent"));
+	BoxComponent->SetBoxExtent(FVector(55.0f));
+	BoxComponent->SetHiddenInGame(false);
+	BoxComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
