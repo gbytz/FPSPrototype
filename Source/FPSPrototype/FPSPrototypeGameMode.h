@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "FPSPrototypeGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AFPSPrototypeGameMode : public AGameModeBase
+class AFPSPrototypeGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
