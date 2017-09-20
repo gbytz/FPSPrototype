@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Containers/Queue.h"
 #include "DestructiblePiece.generated.h"
 
 UCLASS()
@@ -18,6 +19,8 @@ public:
 	ADestructiblePiece();
 
 	void SetColor(FColor InColor);
+
+	void Explote();
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,4 +40,11 @@ public:
 	UBoxComponent* BoxComponent;
 
 	FColor BaseColor;
+
+	UPROPERTY(EditAnywhere)
+	int32 Points;
+
+	int32 NFibonacci(int32 n);
+
+	void CountPoits();
 };

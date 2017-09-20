@@ -26,6 +26,8 @@ ADestructiblePiece::ADestructiblePiece()
 	BoxComponent->SetBoxExtent(FVector(55.0f));
 	BoxComponent->SetHiddenInGame(false);
 	BoxComponent->SetupAttachment(RootComponent);
+
+	Points = 0;
 }
 
 // Called when the game starts or when spawned
@@ -44,9 +46,8 @@ void ADestructiblePiece::Tick(float DeltaTime)
 							  
 void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hit!"));
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hit"));
-	Destroy();
+	//UE_LOG(LogTemp, Warning, TEXT("Hit on %s!"), *GetName());
+	Explote();
 }
 
 void ADestructiblePiece::SetColor(FColor InColor)
@@ -55,4 +56,53 @@ void ADestructiblePiece::SetColor(FColor InColor)
 	DynamicMaterial->SetVectorParameterValue(FName("Base Color"), FLinearColor(InColor));
 	MeshComponent->SetMaterial(0, DynamicMaterial);
 	BaseColor = InColor;
+}
+
+void ADestructiblePiece::Explote()
+{
+	TSet<ADestructiblePiece*> DiscoveredPieces;
+	DiscoveredPieces.Add(this);
+
+	TQueue<ADestructiblePiece*> PiecesToDestroy;
+	PiecesToDestroy.Enqueue(this);
+
+	this->Points = 1;
+
+	TArray<AActor*> OverlappingPieces;
+
+	while ( !PiecesToDestroy.IsEmpty() )
+	{
+		ADestructiblePiece* CurrentPiece;
+		PiecesToDestroy.Dequeue(CurrentPiece);
+		CurrentPiece->GetOverlappingActors(OverlappingPieces, ADestructiblePiece::StaticClass());
+		for (AActor* OtherActor : OverlappingPieces)
+		{
+			ADestructiblePiece* OtherPiece = (ADestructiblePiece*)OtherActor;
+			if (OtherPiece->BaseColor == BaseColor && !DiscoveredPieces.Contains(OtherPiece))
+			{
+				DiscoveredPieces.Add(OtherPiece);
+				PiecesToDestroy.Enqueue(OtherPiece);
+				OtherPiece->Points = CurrentPiece->Points + 1;
+			}
+		}
+		CurrentPiece->CountPoits();
+		CurrentPiece->Destroy();
+	}
+}
+
+void ADestructiblePiece::CountPoits()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s sums %d Points"), *GetName(), NFibonacci(Points));
+}
+
+int32 ADestructiblePiece::NFibonacci(int32 n)
+{
+	int32 PreviousFib = 0;
+	int32 CurrentFib = 1;
+	for (int32 step = 0; step < n; ++step)
+	{
+		CurrentFib = CurrentFib + PreviousFib;
+		PreviousFib = CurrentFib - PreviousFib;
+	}
+	return PreviousFib;
 }
