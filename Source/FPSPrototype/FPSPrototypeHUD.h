@@ -21,5 +21,9 @@ private:
 	/** Crosshair asset pointer */
 	class UTexture2D* CrosshairTex;
 
+	FString GetScoreString(float Score);
+
+	void DrawCrosshair();
+	void DrawScore();
 };
 
