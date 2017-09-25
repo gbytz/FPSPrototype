@@ -143,11 +143,13 @@ void AFPSPrototypeCharacter::OnFire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.Owner = this;
 			if (bUsingMotionControllers)
 			{
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
 				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			}
 			else
 			{
@@ -156,9 +158,7 @@ void AFPSPrototypeCharacter::OnFire()
 				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
 				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
 				// spawn the projectile at the muzzle
 				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			}
