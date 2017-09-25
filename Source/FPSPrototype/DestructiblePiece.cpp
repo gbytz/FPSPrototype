@@ -68,16 +68,16 @@ void ADestructiblePiece::Explote()
 
 	this->Points = 1;
 
+	ADestructiblePiece* CurrentPiece;
 	TArray<AActor*> OverlappingPieces;
 
 	while ( !PiecesToDestroy.IsEmpty() )
-	{
-		ADestructiblePiece* CurrentPiece;
+	{		
 		PiecesToDestroy.Dequeue(CurrentPiece);
 		CurrentPiece->GetOverlappingActors(OverlappingPieces, ADestructiblePiece::StaticClass());
 		for (AActor* OtherActor : OverlappingPieces)
 		{
-			ADestructiblePiece* OtherPiece = (ADestructiblePiece*)OtherActor;
+			ADestructiblePiece* OtherPiece = Cast<ADestructiblePiece>(OtherActor);
 			if (OtherPiece->BaseColor == BaseColor && !DiscoveredPieces.Contains(OtherPiece))
 			{
 				DiscoveredPieces.Add(OtherPiece);
