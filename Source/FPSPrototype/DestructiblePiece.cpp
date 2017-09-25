@@ -3,6 +3,9 @@
 #include "DestructiblePiece.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
+#include "FPSPrototypeCharacter.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 
 // Sets default values
 ADestructiblePiece::ADestructiblePiece()
@@ -46,8 +49,11 @@ void ADestructiblePiece::Tick(float DeltaTime)
 							  
 void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Hit on %s!"), *GetName());
-	Explote();
+	AActor* Projectile = OtherActor;
+	if (Projectile != nullptr && Projectile->GetOwner() != nullptr)
+	{
+		Explode(Projectile->GetOwner());
+	}
 }
 
 void ADestructiblePiece::SetColor(FColor InColor)
@@ -58,7 +64,7 @@ void ADestructiblePiece::SetColor(FColor InColor)
 	BaseColor = InColor;
 }
 
-void ADestructiblePiece::Explote()
+void ADestructiblePiece::Explode(AActor* ProjectileOwner)
 {
 	TSet<ADestructiblePiece*> DiscoveredPieces;
 	DiscoveredPieces.Add(this);
@@ -85,14 +91,19 @@ void ADestructiblePiece::Explote()
 				OtherPiece->Points = CurrentPiece->Points + 1;
 			}
 		}
-		CurrentPiece->CountPoits();
+		CurrentPiece->CountPoits(ProjectileOwner);
 		CurrentPiece->Destroy();
 	}
 }
 
-void ADestructiblePiece::CountPoits()
+void ADestructiblePiece::CountPoits(AActor* ProjectileOwner)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s sums %d Points"), *GetName(), NFibonacci(Points));
+	int32 PointsToSum = NFibonacci(Points);
+	AFPSPrototypeCharacter* Character = Cast<AFPSPrototypeCharacter>(ProjectileOwner);
+	if (Character != nullptr)
+	{
+		Character->GetController()->PlayerState->Score += (float) PointsToSum;
+	}
 }
 
 int32 ADestructiblePiece::NFibonacci(int32 n)

@@ -20,7 +20,7 @@ public:
 
 	void SetColor(FColor InColor);
 
-	void Explote();
+	void Explode(AActor* ProjectileOwner);
 
 protected:
 	// Called when the game starts or when spawned
@@ -46,5 +46,6 @@ public:
 
 	int32 NFibonacci(int32 n);
 
-	void CountPoits();
+	void CountPoits(AActor* ProjectileOwner);
+	
 };
