@@ -37,7 +37,6 @@ void AFPSPrototypeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
-		Destroy();
+		SetLifeSpan(0.01f);
 	}
 }
