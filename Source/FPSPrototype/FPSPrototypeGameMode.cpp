@@ -21,6 +21,8 @@ AFPSPrototypeGameMode::AFPSPrototypeGameMode()
 
 void AFPSPrototypeGameMode::HandleMatchIsWaitingToStart()
 {
+	Super::HandleMatchIsWaitingToStart();
+
 	TArray<FColor> PossibleColors = { FColor::Red, FColor::Green, FColor::Blue };
 	for (TActorIterator<ADestructiblePiece> Iterator(GetWorld()); Iterator; ++Iterator)
 	{
