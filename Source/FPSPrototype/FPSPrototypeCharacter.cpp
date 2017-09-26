@@ -1,5 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
+#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White,text)
+
 #include "FPSPrototypeCharacter.h"
 #include "FPSPrototypeProjectile.h"
 #include "Animation/AnimInstance.h"
@@ -33,7 +35,7 @@ AFPSPrototypeCharacter::AFPSPrototypeCharacter()
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);
+	Mesh1P->SetOnlyOwnerSee(false); // Makes this mesh visible to other players
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
@@ -42,7 +44,7 @@ AFPSPrototypeCharacter::AFPSPrototypeCharacter()
 
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	FP_Gun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	FP_Gun->SetOnlyOwnerSee(false); // Makes this mesh visible to other players
 	FP_Gun->bCastDynamicShadow = false;
 	FP_Gun->CastShadow = false;
 	// FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
@@ -137,6 +139,15 @@ void AFPSPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void AFPSPrototypeCharacter::OnFire()
 {
+	if (Role == ROLE_Authority)
+	{
+		print(TEXT("Soy el server"));
+	}
+	else
+	{
+		print(TEXT("Soy cliente"));
+	}
+
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
