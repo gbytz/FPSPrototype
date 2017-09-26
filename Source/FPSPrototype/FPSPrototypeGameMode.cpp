@@ -27,6 +27,7 @@ void AFPSPrototypeGameMode::HandleMatchIsWaitingToStart()
 	for (TActorIterator<ADestructiblePiece> Iterator(GetWorld()); Iterator; ++Iterator)
 	{
 		FColor PickedColor = PossibleColors[FMath::RandRange(0, PossibleColors.Num()-1)];
+		Iterator->BaseColor = PickedColor;
 		Iterator->SetColor(PickedColor);
 	}
 }

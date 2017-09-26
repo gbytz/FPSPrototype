@@ -6,6 +6,7 @@
 #include "FPSPrototypeCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ADestructiblePiece::ADestructiblePiece()
@@ -31,6 +32,8 @@ ADestructiblePiece::ADestructiblePiece()
 	BoxComponent->SetupAttachment(RootComponent);
 
 	Points = 0;
+
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -49,19 +52,30 @@ void ADestructiblePiece::Tick(float DeltaTime)
 							  
 void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
+	/*
 	AActor* Projectile = OtherActor;
 	if (Projectile != nullptr && Projectile->GetOwner() != nullptr)
 	{
 		Explode(Projectile->GetOwner());
 	}
+	*/
+}
+
+void ADestructiblePiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ADestructiblePiece, BaseColor);
+}
+
+void ADestructiblePiece::OnRep_BaseColor()
+{
+	SetColor(BaseColor);
 }
 
 void ADestructiblePiece::SetColor(FColor InColor)
 {
-	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(MeshComponent->GetMaterial(0), nullptr);
+	UMaterialInstanceDynamic* DynamicMaterial = MeshComponent->CreateAndSetMaterialInstanceDynamic(0);
 	DynamicMaterial->SetVectorParameterValue(FName("Base Color"), FLinearColor(InColor));
-	MeshComponent->SetMaterial(0, DynamicMaterial);
-	BaseColor = InColor;
 }
 
 void ADestructiblePiece::Explode(AActor* ProjectileOwner)

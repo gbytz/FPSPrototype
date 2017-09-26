@@ -26,6 +26,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnRep_BaseColor();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,6 +42,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxComponent;
 
+	UPROPERTY(ReplicatedUsing=OnRep_BaseColor)
 	FColor BaseColor;
 
 	UPROPERTY(EditAnywhere)
@@ -47,5 +51,8 @@ public:
 	int32 NFibonacci(int32 n);
 
 	void CountPoits(AActor* ProjectileOwner);
-	
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 };
