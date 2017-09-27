@@ -34,6 +34,7 @@ ADestructiblePiece::ADestructiblePiece()
 	Points = 0;
 
 	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
