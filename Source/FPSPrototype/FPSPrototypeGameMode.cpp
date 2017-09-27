@@ -5,6 +5,7 @@
 #include "DestructiblePiece.h"
 #include "FPSPrototypeHUD.h"
 #include "FPSPrototypeCharacter.h"
+#include "FPSPrototypeGameState.h"
 #include "Public/EngineUtils.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -17,6 +18,9 @@ AFPSPrototypeGameMode::AFPSPrototypeGameMode()
 
 	// use our custom HUD class
 	HUDClass = AFPSPrototypeHUD::StaticClass();
+
+	// Use my custom GameStateClass
+	GameStateClass = AFPSPrototypeGameState::StaticClass();
 }
 
 void AFPSPrototypeGameMode::HandleMatchIsWaitingToStart()
