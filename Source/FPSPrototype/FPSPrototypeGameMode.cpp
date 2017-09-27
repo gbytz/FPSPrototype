@@ -27,11 +27,28 @@ void AFPSPrototypeGameMode::HandleMatchIsWaitingToStart()
 {
 	Super::HandleMatchIsWaitingToStart();
 
+}
+
+void AFPSPrototypeGameMode::HandleMatchHasStarted()
+{
+	Super::HandleMatchHasStarted();
+	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
+	CustomGameState->SetPieceCount(0);
+
 	TArray<FColor> PossibleColors = { FColor::Red, FColor::Green, FColor::Blue };
 	for (TActorIterator<ADestructiblePiece> Iterator(GetWorld()); Iterator; ++Iterator)
 	{
 		FColor PickedColor = PossibleColors[FMath::RandRange(0, PossibleColors.Num()-1)];
 		Iterator->BaseColor = PickedColor;
 		Iterator->SetColor(PickedColor);
+		CustomGameState->SetPieceCount(CustomGameState->GetPieceCount() + 1);
 	}
+}
+
+bool AFPSPrototypeGameMode::ReadyToEndMatch_Implementation()
+{
+	bool bReadyToEndMatch = false;
+	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
+	bReadyToEndMatch = (CustomGameState->GetPieceCount() == 0);
+	return bReadyToEndMatch;
 }

@@ -12,7 +12,14 @@ class AFPSPrototypeGameMode : public AGameMode
 	GENERATED_BODY()
 
 protected:
+
+	/** Called when the state transitions to WaitingToStart */
 	virtual void HandleMatchIsWaitingToStart() override;
+
+	/** Called when the state transitions to InProgress */
+	virtual void HandleMatchHasStarted() override;
+
+	virtual bool ReadyToEndMatch_Implementation() override;
 
 public:
 	AFPSPrototypeGameMode();
