@@ -4,6 +4,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
 #include "FPSPrototypeCharacter.h"
+#include "FPSPrototypeGameState.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
@@ -109,6 +110,12 @@ void ADestructiblePiece::Explode(AActor* ProjectileOwner)
 		}
 		CurrentPiece->CountPoits(ProjectileOwner);
 		CurrentPiece->Destroy();
+		UWorld* World = GetWorld();
+		if(World != nullptr)
+		{
+			AFPSPrototypeGameState* CustomGameState = World->GetGameState<AFPSPrototypeGameState>();
+			CustomGameState->SetPieceCount(CustomGameState->GetPieceCount() - 1);
+		}
 	}
 }
 
