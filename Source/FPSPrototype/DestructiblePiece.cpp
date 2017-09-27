@@ -52,13 +52,14 @@ void ADestructiblePiece::Tick(float DeltaTime)
 							  
 void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	/*
-	AActor* Projectile = OtherActor;
-	if (Projectile != nullptr && Projectile->GetOwner() != nullptr)
+	if (Role == ROLE_Authority)
 	{
-		Explode(Projectile->GetOwner());
+		AActor* ProjectileOwner = OtherActor->GetOwner();
+		if (ProjectileOwner != nullptr)
+		{
+			Explode(ProjectileOwner);
+		}
 	}
-	*/
 }
 
 void ADestructiblePiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -112,11 +113,10 @@ void ADestructiblePiece::Explode(AActor* ProjectileOwner)
 
 void ADestructiblePiece::CountPoits(AActor* ProjectileOwner)
 {
-	int32 PointsToSum = NFibonacci(Points);
-	AFPSPrototypeCharacter* Character = Cast<AFPSPrototypeCharacter>(ProjectileOwner);
-	if (Character != nullptr)
+	APlayerController* PlayerController = Cast<APlayerController>(ProjectileOwner);
+	if (PlayerController != nullptr)
 	{
-		Character->GetController()->PlayerState->Score += (float) PointsToSum;
+		PlayerController->PlayerState->Score += (float) NFibonacci(Points);
 	}
 }
 
