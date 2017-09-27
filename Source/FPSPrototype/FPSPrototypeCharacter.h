@@ -45,6 +45,17 @@ class AFPSPrototypeCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
+	void AttempToSpawnProjectile();
+
+	void SpawnProjectile();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSpawnProjectile();
+
+	void ServerSpawnProjectile_Implementation();
+
+	bool ServerSpawnProjectile_Validate();
+
 public:
 	AFPSPrototypeCharacter();
 
@@ -81,9 +92,6 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
 protected:
-	
-	/** Fires a projectile. */
-	void OnFire();
 
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();

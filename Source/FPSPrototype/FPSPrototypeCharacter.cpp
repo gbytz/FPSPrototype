@@ -120,7 +120,7 @@ void AFPSPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AFPSPrototypeCharacter::TouchStarted);
 	if (EnableTouchscreenMovement(PlayerInputComponent) == false)
 	{
-		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSPrototypeCharacter::OnFire);
+		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSPrototypeCharacter::AttempToSpawnProjectile);
 	}
 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AFPSPrototypeCharacter::OnResetVR);
@@ -135,63 +135,6 @@ void AFPSPrototypeCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFPSPrototypeCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFPSPrototypeCharacter::LookUpAtRate);
-}
-
-void AFPSPrototypeCharacter::OnFire()
-{
-	if (Role == ROLE_Authority)
-	{
-		print(TEXT("Soy el server"));
-	}
-	else
-	{
-		print(TEXT("Soy cliente"));
-	}
-
-	// try and fire a projectile
-	if (ProjectileClass != NULL)
-	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
-		{
-			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.Owner = this;
-			if (bUsingMotionControllers)
-			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-
-				//Set Spawn Collision Handling Override
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-				// spawn the projectile at the muzzle
-				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			}
-		}
-	}
-
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
 }
 
 void AFPSPrototypeCharacter::OnResetVR()
@@ -219,7 +162,7 @@ void AFPSPrototypeCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const
 	}
 	if ((FingerIndex == TouchItem.FingerIndex) && (TouchItem.bMoved == false))
 	{
-		OnFire();
+		AttempToSpawnProjectile();
 	}
 	TouchItem.bIsPressed = false;
 }
@@ -305,4 +248,74 @@ bool AFPSPrototypeCharacter::EnableTouchscreenMovement(class UInputComponent* Pl
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AFPSPrototypeCharacter::TouchUpdate);
 	}
 	return bResult;
+}
+
+void AFPSPrototypeCharacter::AttempToSpawnProjectile()
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerSpawnProjectile();
+	}
+	else
+	{
+		SpawnProjectile();
+	}
+}
+
+void AFPSPrototypeCharacter::SpawnProjectile()
+{
+	// try and fire a projectile
+	if (ProjectileClass != NULL)
+	{
+		UWorld* const World = GetWorld();
+		if (World != NULL)
+		{
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.Owner = GetController();
+			if (bUsingMotionControllers)
+			{
+				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			}
+			else
+			{
+				const FRotator SpawnRotation = GetControlRotation();
+				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+
+				//Set Spawn Collision Handling Override
+				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+				// spawn the projectile at the muzzle
+				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			}
+		}
+	}
+
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
+void AFPSPrototypeCharacter::ServerSpawnProjectile_Implementation()
+{
+	SpawnProjectile();
+}
+
+bool AFPSPrototypeCharacter::ServerSpawnProjectile_Validate()
+{
+	return true;
 }
