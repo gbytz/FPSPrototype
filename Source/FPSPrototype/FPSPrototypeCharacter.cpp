@@ -1,7 +1,5 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White,text)
-
 #include "FPSPrototypeCharacter.h"
 #include "FPSPrototypeProjectile.h"
 #include "Animation/AnimInstance.h"
@@ -12,6 +10,8 @@
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
+#include "Classes/Engine/World.h"
+#include "GameFramework/GameState.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -252,13 +252,20 @@ bool AFPSPrototypeCharacter::EnableTouchscreenMovement(class UInputComponent* Pl
 
 void AFPSPrototypeCharacter::AttempToSpawnProjectile()
 {
-	if (Role < ROLE_Authority)
+	UWorld* World = GetWorld();
+	if (World != nullptr)
 	{
-		ServerSpawnProjectile();
-	}
-	else
-	{
-		SpawnProjectile();
+		AGameState* GameState = Cast<AGameState>(World->GetGameState());
+		if (GameState->IsMatchInProgress()) {
+			if (Role < ROLE_Authority)
+			{
+				ServerSpawnProjectile();
+			}
+			else
+			{
+				SpawnProjectile();
+			}
+		}
 	}
 }
 
