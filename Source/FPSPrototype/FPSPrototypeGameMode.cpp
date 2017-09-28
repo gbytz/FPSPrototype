@@ -36,11 +36,11 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 	Super::HandleMatchHasStarted();
 	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
 	CustomGameState->SetPieceCount(0);
-	for (TActorIterator<ADestructiblePiece> Iterator(GetWorld()); Iterator; ++Iterator)
+	for (TActorIterator<ADestructiblePiece> PieceIterator(GetWorld()); PieceIterator; ++PieceIterator)
 	{
+		ADestructiblePiece* Piece = *PieceIterator;
 		FColor PickedColor = GetPossibleColor();
-		Iterator->BaseColor = PickedColor;
-		Iterator->SetColor(PickedColor);
+		Piece->SetColor(PickedColor);
 		CustomGameState->SetPieceCount(CustomGameState->GetPieceCount() + 1);
 	}
 }
