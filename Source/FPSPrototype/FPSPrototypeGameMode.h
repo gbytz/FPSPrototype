@@ -11,6 +11,9 @@ class AFPSPrototypeGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
+public:
+	AFPSPrototypeGameMode();
+
 protected:
 
 	UPROPERTY(EditAnywhere)
@@ -22,10 +25,12 @@ protected:
 	/** Called when the state transitions to InProgress */
 	virtual void HandleMatchHasStarted() override;
 
+	/** Called when the map transitions to WaitingPostMatch */
+	virtual void HandleMatchHasEnded() override;
+
+	/** @return true if ready to End Match. */
 	virtual bool ReadyToEndMatch_Implementation() override;
 
-public:
-	AFPSPrototypeGameMode();
 };
 
 
