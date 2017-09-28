@@ -47,9 +47,8 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 
 bool AFPSPrototypeGameMode::ReadyToEndMatch_Implementation()
 {
-	bool bReadyToEndMatch = false;
 	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
-	bReadyToEndMatch = (CustomGameState->GetPieceCount() == 0);
+	const bool bReadyToEndMatch = (CustomGameState->GetPieceCount() == 0);
 	return bReadyToEndMatch;
 }
 

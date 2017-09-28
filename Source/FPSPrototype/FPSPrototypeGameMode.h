@@ -34,6 +34,3 @@ protected:
 	/** @return a color picked from the PossibleColors array */
 	virtual FColor GetPossibleColor() const;
 };
-
-
-
