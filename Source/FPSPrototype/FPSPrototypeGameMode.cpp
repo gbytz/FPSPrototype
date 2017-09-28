@@ -54,7 +54,7 @@ bool AFPSPrototypeGameMode::ReadyToEndMatch_Implementation()
 	return bReadyToEndMatch;
 }
 
-FColor AFPSPrototypeGameMode::GetPossibleColor()
+FColor AFPSPrototypeGameMode::GetPossibleColor() const
 {
 	return PossibleColors[FMath::RandRange(0, PossibleColors.Num() - 1)];
 }
