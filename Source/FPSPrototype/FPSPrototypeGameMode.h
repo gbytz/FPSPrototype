@@ -31,6 +31,8 @@ protected:
 	/** @return true if ready to End Match. */
 	virtual bool ReadyToEndMatch_Implementation() override;
 
+	/** @return a color picked from the PossibleColors array */
+	virtual FColor GetPossibleColor() const;
 };
 
 
