@@ -39,7 +39,7 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 	CustomGameState->SetPieceCount(0);
 	for (TActorIterator<ADestructiblePiece> Iterator(GetWorld()); Iterator; ++Iterator)
 	{
-		FColor PickedColor = PossibleColors[FMath::RandRange(0, PossibleColors.Num()-1)];
+		FColor PickedColor = GetPossibleColor();
 		Iterator->BaseColor = PickedColor;
 		Iterator->SetColor(PickedColor);
 		CustomGameState->SetPieceCount(CustomGameState->GetPieceCount() + 1);
@@ -52,4 +52,9 @@ bool AFPSPrototypeGameMode::ReadyToEndMatch_Implementation()
 	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
 	bReadyToEndMatch = (CustomGameState->GetPieceCount() == 0);
 	return bReadyToEndMatch;
+}
+
+FColor AFPSPrototypeGameMode::GetPossibleColor()
+{
+	return PossibleColors[FMath::RandRange(0, PossibleColors.Num() - 1)];
 }
