@@ -4,7 +4,6 @@
 
 #include "DestructiblePiece.h"
 #include "FPSPrototypeHUD.h"
-#include "FPSPrototypeCharacter.h"
 #include "FPSPrototypeGameState.h"
 #include "Public/EngineUtils.h"
 #include "UObject/ConstructorHelpers.h"
