@@ -13,6 +13,9 @@ class AFPSPrototypeGameMode : public AGameMode
 
 protected:
 
+	UPROPERTY(EditAnywhere)
+	TArray<FColor> PossibleColors;
+
 	/** Called when the state transitions to WaitingToStart */
 	virtual void HandleMatchIsWaitingToStart() override;
 

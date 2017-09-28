@@ -16,11 +16,14 @@ AFPSPrototypeGameMode::AFPSPrototypeGameMode()
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPersonCPP/Blueprints/FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
-	// use our custom HUD class
+	// Use my custom HUD class
 	HUDClass = AFPSPrototypeHUD::StaticClass();
 
-	// Use my custom GameStateClass
+	// Use my custom GameState class
 	GameStateClass = AFPSPrototypeGameState::StaticClass();
+
+	// Set the default possible colors.
+	PossibleColors = { FColor::Red, FColor::Green, FColor::Blue };
 }
 
 void AFPSPrototypeGameMode::HandleMatchIsWaitingToStart()
@@ -34,8 +37,6 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 	Super::HandleMatchHasStarted();
 	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
 	CustomGameState->SetPieceCount(0);
-
-	TArray<FColor> PossibleColors = { FColor::Red, FColor::Green, FColor::Blue };
 	for (TActorIterator<ADestructiblePiece> Iterator(GetWorld()); Iterator; ++Iterator)
 	{
 		FColor PickedColor = PossibleColors[FMath::RandRange(0, PossibleColors.Num()-1)];
