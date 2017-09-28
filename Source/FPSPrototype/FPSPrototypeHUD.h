@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "GameFramework/GameState.h"
 #include "FPSPrototypeHUD.generated.h"
 
 UCLASS()
@@ -21,9 +22,16 @@ private:
 	/** Crosshair asset pointer */
 	class UTexture2D* CrosshairTex;
 
-	FString GetScoreString(float Score);
+	class UFont* DefaultFont;
+
+	float DefaultScale = 2.0f;
+
+	FLinearColor DefaultColor = FLinearColor::White;
+	FLinearColor PlayerColor = FLinearColor::Green;
+	FLinearColor TableColor = FLinearColor(0.5, 0.5, 0.5, 0.5);
 
 	void DrawCrosshair();
-	void DrawScore();
+	void DrawScore(APlayerState* PlayerState, float X, float Y, FLinearColor TextColor);
+	void DrawScoreTable(AGameState* InGameState);
 };
 

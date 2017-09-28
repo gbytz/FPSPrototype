@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
+#include "Classes/Engine/World.h"
 
 AFPSPrototypeHUD::AFPSPrototypeHUD()
 {
@@ -19,14 +20,24 @@ AFPSPrototypeHUD::AFPSPrototypeHUD()
 void AFPSPrototypeHUD::DrawHUD()
 {
 	Super::DrawHUD();
-	DrawCrosshair();
-	DrawScore();
-}
+	UWorld* World = GetWorld();
+	if (World != nullptr)
+	{
+		AGameState* CurrentGameState = GetWorld()->GetGameState<AGameState>();
+		if (CurrentGameState != nullptr)
+		{
+			if (CurrentGameState->IsMatchInProgress()) {
+				DrawCrosshair();
 
-FString AFPSPrototypeHUD::GetScoreString(float Score)
-{
-	const FString ScoreText = FString::Printf(TEXT("Score: %i"), (int) Score);
-	return ScoreText;
+				const FVector2D BottomCenter(Canvas->ClipX * 0.5f, Canvas->ClipY);
+				DrawScore(GetOwningPlayerController()->PlayerState, BottomCenter.X, BottomCenter.Y - 50, DefaultColor);
+			}
+			else if(CurrentGameState->HasMatchEnded())
+			{
+				DrawScoreTable(CurrentGameState);
+			}
+		}
+	}
 }
 
 void AFPSPrototypeHUD::DrawCrosshair()
@@ -37,8 +48,7 @@ void AFPSPrototypeHUD::DrawCrosshair()
 	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
 
 	// offset by half the texture's dimensions so that the center of the texture aligns with the center of the Canvas
-	const FVector2D CrosshairDrawPosition((Center.X),
-		(Center.Y + 20.0f));
+	const FVector2D CrosshairDrawPosition((Center.X), (Center.Y + 20.0f));
 
 	// draw the crosshair
 	FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
@@ -46,13 +56,60 @@ void AFPSPrototypeHUD::DrawCrosshair()
 	Canvas->DrawItem(TileItem);
 }
 
-void AFPSPrototypeHUD::DrawScore()
+void AFPSPrototypeHUD::DrawScore(APlayerState* PlayerState, float X, float Y, FLinearColor TextColor)
 {
-	// Its seems PlayerState is null at the beggining of the game so I check its a valid pointer before trying to get the score.
-	if (PlayerOwner != nullptr && PlayerOwner->PlayerState != nullptr)
+	if (PlayerState != nullptr)
 	{
-		const FVector2D BottomRight(Canvas->ClipX, Canvas->ClipY);
-		const FVector2D ScoreDrawPosition((BottomRight.X - 150), BottomRight.Y - 50);
-		DrawText(GetScoreString(PlayerOwner->PlayerState->Score), FLinearColor::Red, ScoreDrawPosition.X, ScoreDrawPosition.Y, nullptr, 2.0f, false);
+		float MiddleSpace = 60;
+		float NameWidth;	
+		float NameHeight;
+		float PointsWidth;
+		float PointsHeight;
+		GetTextSize(PlayerState->PlayerName, NameWidth, NameHeight, DefaultFont, DefaultScale);
+		GetTextSize(FString::FromInt((int) PlayerState->Score), PointsWidth, PointsHeight, DefaultFont, DefaultScale);
+
+		float NameX = X - (MiddleSpace * 0.5f) - NameWidth;
+		float PointsX = X + (MiddleSpace * 0.5f);
+
+		DrawText(PlayerState->PlayerName, TextColor, NameX, Y, DefaultFont, DefaultScale, false);
+		DrawText(FString::FromInt((int) PlayerState->Score) + FString(" pts"), TextColor, PointsX, Y, DefaultFont, DefaultScale, false);
+	}
+}
+
+void AFPSPrototypeHUD::DrawScoreTable(AGameState* InGameState)
+{
+	FVector2D CanvasCenter = FVector2D();
+	Canvas->GetCenter(CanvasCenter.X, CanvasCenter.Y);
+	float CanvasWidth = Canvas->SizeX;
+	float CanvasHeight = Canvas->SizeY;
+
+	float TableWidth = (CanvasWidth / 3);
+	float TableHeight = (CanvasHeight / 3);
+	float TableX = (CanvasCenter.X - (TableWidth * 0.5f));
+	float TableY = (CanvasCenter.Y - (TableHeight * 0.5f));
+	
+	DrawRect(TableColor, TableX, TableY, TableWidth, TableHeight);
+
+	float LeftPadding = 50;
+	float TopPadding = 50;
+
+	float Y = CanvasCenter.Y;
+	float PlayerNameX = TableX + (TableWidth * 0.5f);
+	float PlayerNameY = TableY + TopPadding;
+
+	float PlayerNameHeight = 25;
+	float PlayerNameWidth = 300;
+
+	for (APlayerState* PlayerState : InGameState->PlayerArray)
+	{
+		if (PlayerState == GetOwningPlayerController()->PlayerState)
+		{
+			DrawScore(PlayerState, PlayerNameX, PlayerNameY, PlayerColor);
+		}
+		else 
+		{
+			DrawScore(PlayerState, PlayerNameX, PlayerNameY, DefaultColor);
+		}
+		PlayerNameY = PlayerNameY + PlayerNameHeight;
 	}
 }
