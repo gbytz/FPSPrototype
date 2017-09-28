@@ -18,6 +18,9 @@ public:
 	void SetPieceCount(uint64 InPieceCount);
 	uint64 GetPieceCount();
 
+protected:
+	virtual void HandleMatchHasEnded() override;
+
 private:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
