@@ -41,6 +41,7 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 		ADestructiblePiece* Piece = *PieceIterator;
 		FColor PickedColor = GetPossibleColor();
 		Piece->SetColor(PickedColor);
+		Piece->OnRep_BaseColor(); // Change the piece material color in the server.
 		CustomGameState->SetPieceCount(CustomGameState->GetPieceCount() + 1);
 	}
 }
