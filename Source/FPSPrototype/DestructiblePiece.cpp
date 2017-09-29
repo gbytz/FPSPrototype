@@ -37,19 +37,6 @@ ADestructiblePiece::ADestructiblePiece()
 	SetReplicates(true);
 	SetReplicateMovement(true);
 }
-
-// Called when the game starts or when spawned
-void ADestructiblePiece::BeginPlay()
-{
-	Super::BeginPlay();	
-}
-
-// Called every frame
-void ADestructiblePiece::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 							  
 void ADestructiblePiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {

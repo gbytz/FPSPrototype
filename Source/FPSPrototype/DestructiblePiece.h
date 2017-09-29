@@ -18,9 +18,6 @@ public:
 	// Sets default values for this actor's properties
 	ADestructiblePiece();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	/**
 	 * Sets the color of the piece
 	 * @param InColor - The color the piece will be
@@ -46,11 +43,6 @@ public:
 	/** Called when the piece is hit by other actor */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-protected:
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 private:
 
