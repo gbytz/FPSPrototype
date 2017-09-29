@@ -11,7 +11,7 @@ void AFPSPrototypeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME(AFPSPrototypeGameState, PieceCount);
 }
 
-void AFPSPrototypeGameState::SetPieceCount(uint64 InPieceCount)
+void AFPSPrototypeGameState::SetPieceCount(const uint64 InPieceCount)
 {
 	// Only the server can set the piece count
 	if (Role == ROLE_Authority)
@@ -20,7 +20,7 @@ void AFPSPrototypeGameState::SetPieceCount(uint64 InPieceCount)
 	}
 }
 
-uint64 AFPSPrototypeGameState::GetPieceCount()
+uint64 AFPSPrototypeGameState::GetPieceCount() const
 {
 	return PieceCount;
 }

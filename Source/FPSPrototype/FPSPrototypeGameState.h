@@ -15,14 +15,23 @@ class FPSPROTOTYPE_API AFPSPrototypeGameState : public AGameState
 	GENERATED_BODY()
 
 public:
-	void SetPieceCount(uint64 InPieceCount);
-	uint64 GetPieceCount();
+
+	/** Sets the internal piece counter value
+	 * @param InPieceCount - New value of the piece counter
+	 */
+	void SetPieceCount(const uint64 InPieceCount);
+
+	/** @return the value of the piece counter */
+	uint64 GetPieceCount() const;
 
 protected:
+
+	/** Called when the map transitions to WaitingPostMatch */
 	virtual void HandleMatchHasEnded() override;
 
 private:
 
+	/** Returns properties that are replicated for the lifetime of the actor channel */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(Replicated)
