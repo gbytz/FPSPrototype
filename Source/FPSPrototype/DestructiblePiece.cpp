@@ -29,11 +29,10 @@ ADestructiblePiece::ADestructiblePiece()
 	}
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapComponent"));
-	BoxComponent->SetBoxExtent(FVector(55.0f));
-	BoxComponent->SetHiddenInGame(false);
+	BoxComponent->SetBoxExtent(FVector(51.0f));
 	BoxComponent->SetupAttachment(RootComponent);
 
-	Points = 0;
+	DestructionLevel = 0;
 
 	SetReplicates(true);
 	SetReplicateMovement(true);
@@ -42,8 +41,7 @@ ADestructiblePiece::ADestructiblePiece()
 // Called when the game starts or when spawned
 void ADestructiblePiece::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 // Called every frame
@@ -73,16 +71,16 @@ void ADestructiblePiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void ADestructiblePiece::OnRep_BaseColor()
 {
-	SetColor(BaseColor);
+	UMaterialInstanceDynamic* DynamicMaterial = MeshComponent->CreateAndSetMaterialInstanceDynamic(0);
+	DynamicMaterial->SetVectorParameterValue(FName("Base Color"), FLinearColor(BaseColor));
 }
 
 void ADestructiblePiece::SetColor(FColor InColor)
 {
-	UMaterialInstanceDynamic* DynamicMaterial = MeshComponent->CreateAndSetMaterialInstanceDynamic(0);
-	DynamicMaterial->SetVectorParameterValue(FName("Base Color"), FLinearColor(InColor));
+	BaseColor = InColor;
 }
 
-void ADestructiblePiece::Explode(AActor* ProjectileOwner)
+void ADestructiblePiece::Explode(AActor* InProjectileOwner)
 {
 	TSet<ADestructiblePiece*> DiscoveredPieces;
 	DiscoveredPieces.Add(this);
@@ -90,7 +88,7 @@ void ADestructiblePiece::Explode(AActor* ProjectileOwner)
 	TQueue<ADestructiblePiece*> PiecesToDestroy;
 	PiecesToDestroy.Enqueue(this);
 
-	this->Points = 1;
+	this->DestructionLevel = 1;
 
 	ADestructiblePiece* CurrentPiece;
 	TArray<AActor*> OverlappingPieces;
@@ -106,11 +104,12 @@ void ADestructiblePiece::Explode(AActor* ProjectileOwner)
 			{
 				DiscoveredPieces.Add(OtherPiece);
 				PiecesToDestroy.Enqueue(OtherPiece);
-				OtherPiece->Points = CurrentPiece->Points + 1;
+				OtherPiece->DestructionLevel = CurrentPiece->DestructionLevel + 1;
 			}
 		}
-		CurrentPiece->CountPoits(ProjectileOwner);
+		CurrentPiece->CountPoits(InProjectileOwner);
 		CurrentPiece->Destroy();
+		
 		UWorld* World = GetWorld();
 		if(World != nullptr)
 		{
@@ -120,12 +119,12 @@ void ADestructiblePiece::Explode(AActor* ProjectileOwner)
 	}
 }
 
-void ADestructiblePiece::CountPoits(AActor* ProjectileOwner)
+void ADestructiblePiece::CountPoits(AActor* InProjectileOwner)
 {
-	APlayerController* PlayerController = Cast<APlayerController>(ProjectileOwner);
+	APlayerController* PlayerController = Cast<APlayerController>(InProjectileOwner);
 	if (PlayerController != nullptr)
 	{
 		UFPSPrototypeGameInstance* ThisGameInstance = Cast<UFPSPrototypeGameInstance>(GetGameInstance());
-		PlayerController->PlayerState->Score += (float) ThisGameInstance->GetNthFibonacci(Points);
+		PlayerController->PlayerState->Score += (float)ThisGameInstance->GetNthFibonacci(DestructionLevel);
 	}
 }

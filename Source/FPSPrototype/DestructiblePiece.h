@@ -18,41 +18,58 @@ public:
 	// Sets default values for this actor's properties
 	ADestructiblePiece();
 
-	void SetColor(FColor InColor);
-
-	void Explode(AActor* ProjectileOwner);
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void OnRep_BaseColor();
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	/**
+	 * Sets the color of the piece
+	 * @param InColor - The color the piece will be
+	 */
+	void SetColor(FColor InColor);
+
+	/**
+	 * Destroys a piece and every other adyacent piece of the same color in a BFS traversal way 
+	 * @param InProjectileOwner - Pointer to the actor who shot the projectile
+	 */
+	void Explode(AActor* InProjectileOwner);
+
+	/**
+	* Increase the score of the player received by parameter
+	* @param InProjectileOwner - Pointer to the actor who shot the projectile
+	*/
+	void CountPoits(AActor* InProjectileOwner);
+
+	/** Called when the BaseColor property is replicated */
+	UFUNCTION()
+	void OnRep_BaseColor();
+
+	/** Called when the piece is hit by other actor */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
+protected:
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+private:
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/** The color of the piece */
+	UPROPERTY(ReplicatedUsing = OnRep_BaseColor)
+	FColor BaseColor;
+
+	/** Visual mesh component of the piece */
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* MeshComponent;
 
+	/** Box component used to generate overlapping events */
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxComponent;
 
-	UPROPERTY(ReplicatedUsing=OnRep_BaseColor)
-	FColor BaseColor;
-
+	/** Takes acount of the "distance" from the initial hit in a sequence of pieces destruction */
 	UPROPERTY(EditAnywhere)
-	int32 Points;
-
-	int32 NFibonacci(int32 n);
-
-	void CountPoits(AActor* ProjectileOwner);
-
-private:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	int64 DestructionLevel;
 
 };
