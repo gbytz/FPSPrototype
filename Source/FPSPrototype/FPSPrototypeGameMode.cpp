@@ -29,12 +29,12 @@ AFPSPrototypeGameMode::AFPSPrototypeGameMode()
 void AFPSPrototypeGameMode::HandleMatchIsWaitingToStart()
 {
 	Super::HandleMatchIsWaitingToStart();
-
 }
 
 void AFPSPrototypeGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
+
 	AFPSPrototypeGameState* CustomGameState = GetGameState<AFPSPrototypeGameState>();
 	CustomGameState->SetPieceCount(0);
 	for (TActorIterator<ADestructiblePiece> PieceIterator(GetWorld()); PieceIterator; ++PieceIterator)
@@ -48,6 +48,11 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 
 	UFPSPrototypeGameInstance* ThisGameInstance = Cast<UFPSPrototypeGameInstance>(GetGameInstance());
 	ThisGameInstance->InitFibonaccis(CustomGameState->GetPieceCount());
+}
+
+void AFPSPrototypeGameMode::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
 }
 
 bool AFPSPrototypeGameMode::ReadyToEndMatch_Implementation()

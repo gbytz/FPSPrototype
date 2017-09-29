@@ -12,10 +12,12 @@ class AFPSPrototypeGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+
 	AFPSPrototypeGameMode();
 
 protected:
 
+	/** Contains the possible piece colors */
 	UPROPERTY(EditAnywhere)
 	TArray<FColor> PossibleColors;
 
