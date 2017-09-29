@@ -6,9 +6,6 @@
 #include "GameFramework/GameState.h"
 #include "FPSPrototypeGameState.generated.h"
 
-/**
- *
- */
 UCLASS()
 class FPSPROTOTYPE_API AFPSPrototypeGameState : public AGameState
 {
@@ -16,7 +13,8 @@ class FPSPROTOTYPE_API AFPSPrototypeGameState : public AGameState
 
 public:
 
-	/** Sets the internal piece counter value
+	/**
+	 * Sets the internal piece counter value
 	 * @param InPieceCount - New value of the piece counter
 	 */
 	void SetPieceCount(const uint64 InPieceCount);
@@ -34,6 +32,7 @@ private:
 	/** Returns properties that are replicated for the lifetime of the actor channel */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/** Takes acount of the number of remaining pieces in the current game */
 	UPROPERTY(Replicated)
 	uint64 PieceCount;
 };
