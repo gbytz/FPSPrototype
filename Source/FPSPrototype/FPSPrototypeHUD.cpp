@@ -15,6 +15,12 @@ AFPSPrototypeHUD::AFPSPrototypeHUD()
 	// Set the crosshair texture
 	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("/Game/FirstPerson/Textures/FirstPersonCrosshair"));
 	CrosshairTex = CrosshairTexObj.Object;
+
+	static ConstructorHelpers::FObjectFinder<UFont> FontObj(TEXT("/Game/FirstPerson/Fonts/Paintball_Beta_4a_Font.Paintball_Beta_4a_Font"));
+	if (FontObj.Succeeded())
+	{
+		DefaultFont = FontObj.Object;
+	}
 }
 
 void AFPSPrototypeHUD::DrawHUD()
