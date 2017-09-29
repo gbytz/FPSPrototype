@@ -35,8 +35,8 @@ void AFPSPrototypeHUD::DrawHUD()
 			if (CurrentGameState->IsMatchInProgress()) {
 				DrawCrosshair();
 
-				const FVector2D BottomCenter(Canvas->ClipX * 0.5f, Canvas->ClipY);
-				DrawScore(GetOwningPlayerController()->PlayerState, BottomCenter.X, BottomCenter.Y - 50, DefaultColor);
+				const FVector2D TopCenter(Canvas->ClipX * 0.5f, 0);
+				DrawScore(GetOwningPlayerController()->PlayerState, TopCenter.X, TopCenter.Y + 50, DefaultColor);
 			}
 			else if(CurrentGameState->HasMatchEnded())
 			{
@@ -62,23 +62,29 @@ void AFPSPrototypeHUD::DrawCrosshair()
 	Canvas->DrawItem(TileItem);
 }
 
-void AFPSPrototypeHUD::DrawScore(APlayerState* PlayerState, float X, float Y, FLinearColor TextColor)
+void AFPSPrototypeHUD::DrawScore(APlayerState* InPlayerState, const float InX, const float InY, const FLinearColor InTextColor)
 {
-	if (PlayerState != nullptr)
+	if (InPlayerState != nullptr)
 	{
-		float MiddleSpace = 60;
+		// Magic number to set the space between the player name and the score
+		const float MiddleSpace = 80.0f;
+
+		// Calculates player name text size
 		float NameWidth;	
 		float NameHeight;
-		float PointsWidth;
-		float PointsHeight;
-		GetTextSize(PlayerState->PlayerName, NameWidth, NameHeight, DefaultFont, DefaultScale);
-		GetTextSize(FString::FromInt((int) PlayerState->Score), PointsWidth, PointsHeight, DefaultFont, DefaultScale);
+		GetTextSize(InPlayerState->PlayerName, NameWidth, NameHeight, DefaultFont, DefaultScale);
 
-		float NameX = X - (MiddleSpace * 0.5f) - NameWidth;
-		float PointsX = X + (MiddleSpace * 0.5f);
+		const float NameX = InX - (MiddleSpace * 0.5f) - NameWidth;
+		DrawText(InPlayerState->PlayerName, InTextColor, NameX, InY, DefaultFont, DefaultScale, false);
 
-		DrawText(PlayerState->PlayerName, TextColor, NameX, Y, DefaultFont, DefaultScale, false);
-		DrawText(FString::FromInt((int) PlayerState->Score) + FString(" pts"), TextColor, PointsX, Y, DefaultFont, DefaultScale, false);
+		// Calculates the score text size
+		const FString ScoreText = FString::FromInt((int)InPlayerState->Score) + FString(" pts");
+		float ScoreWidth;
+		float ScoreHeight;
+		GetTextSize(ScoreText, ScoreWidth, ScoreHeight, DefaultFont, DefaultScale);
+
+		const float ScoreX = InX + (MiddleSpace * 0.5f);
+		DrawText(ScoreText, InTextColor, ScoreX, InY, DefaultFont, DefaultScale, false);
 	}
 }
 
@@ -86,26 +92,29 @@ void AFPSPrototypeHUD::DrawScoreTable(AGameState* InGameState)
 {
 	FVector2D CanvasCenter = FVector2D();
 	Canvas->GetCenter(CanvasCenter.X, CanvasCenter.Y);
-	float CanvasWidth = Canvas->SizeX;
-	float CanvasHeight = Canvas->SizeY;
+	const float CanvasWidth = Canvas->SizeX;
+	const float CanvasHeight = Canvas->SizeY;
 
-	float TableWidth = (CanvasWidth / 3);
-	float TableHeight = (CanvasHeight / 3);
-	float TableX = (CanvasCenter.X - (TableWidth * 0.5f));
-	float TableY = (CanvasCenter.Y - (TableHeight * 0.5f));
-	
+	float TextWidth;
+	float TextHeight;
+	GetTextSize(TEXT("A"), TextWidth, TextHeight, DefaultFont, DefaultScale);
+
+	// Calculates the table height based on content I'll have
+	const float VerticalSpacing = 3.5f;
+	const float ContentHeigh = InGameState->PlayerArray.Num() * (TextHeight + VerticalSpacing) + VerticalSpacing;
+	const float DefaultTableHeigh = (CanvasHeight / 3.0f);
+	const float TableHeight = ContentHeigh > DefaultTableHeigh ? ContentHeigh : DefaultTableHeigh;
+
+	// Calculates the table width
+	const float TableWidth = (CanvasWidth / 3.0f);
+	const float TableX = (CanvasCenter.X - (TableWidth * 0.5f));
+	const float TableY = (CanvasCenter.Y - (TableHeight * 0.5f));
+
 	DrawRect(TableColor, TableX, TableY, TableWidth, TableHeight);
 
-	float LeftPadding = 50;
-	float TopPadding = 50;
-
-	float Y = CanvasCenter.Y;
-	float PlayerNameX = TableX + (TableWidth * 0.5f);
-	float PlayerNameY = TableY + TopPadding;
-
-	float PlayerNameHeight = 25;
-	float PlayerNameWidth = 300;
-
+	// Draw the list of players
+	const float PlayerNameX = TableX + (TableWidth * 0.5f);
+	float PlayerNameY = TableY + (TableHeight * 0.5f) - (ContentHeigh * 0.5) + VerticalSpacing;
 	for (APlayerState* PlayerState : InGameState->PlayerArray)
 	{
 		if (PlayerState == GetOwningPlayerController()->PlayerState)
@@ -116,6 +125,23 @@ void AFPSPrototypeHUD::DrawScoreTable(AGameState* InGameState)
 		{
 			DrawScore(PlayerState, PlayerNameX, PlayerNameY, DefaultColor);
 		}
-		PlayerNameY = PlayerNameY + PlayerNameHeight;
+		PlayerNameY = PlayerNameY + TextHeight + VerticalSpacing;
 	}
+
+	// Draw the header of the table;
+	const FString HeaderText = FString(TEXT("Leaderboard"));
+	float HeaderTextWidth;
+	float HeaderTextHeight;
+	const float HeaderTextScale = DefaultScale * 1.50f;
+	GetTextSize(HeaderText, HeaderTextWidth, HeaderTextHeight, DefaultFont, HeaderTextScale);
+
+	const float HeaderBackgroundWidth = TableWidth * 1.05f;
+	const float HeaderBackgroundX = (CanvasCenter.X - (HeaderBackgroundWidth * 0.5f));;
+	const float HeaderBackgroundHeight = HeaderTextHeight * 1.5f;
+	const float HeaderBackgroundY = TableY - HeaderBackgroundHeight;
+	DrawRect(HeaderBackgroundColor, HeaderBackgroundX, HeaderBackgroundY, HeaderBackgroundWidth, HeaderBackgroundHeight);
+
+	const float HeaderTextX = HeaderBackgroundX + ((HeaderBackgroundWidth - HeaderTextWidth) * 0.5f);
+	const float HeaderTextY = HeaderBackgroundY - ((HeaderTextHeight - HeaderBackgroundHeight) * 0.5f);
+	DrawText(HeaderText, HeaderTextColor, HeaderTextX, HeaderTextY, DefaultFont, HeaderTextScale);
 }
