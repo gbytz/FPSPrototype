@@ -296,9 +296,23 @@ void AFPSPrototypeCharacter::SpawnProjectile()
 				// spawn the projectile at the muzzle
 				World->SpawnActor<AFPSPrototypeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			}
+			ShowShotFX();
 		}
 	}
+}
 
+void AFPSPrototypeCharacter::ServerSpawnProjectile_Implementation()
+{
+	SpawnProjectile();
+}
+
+bool AFPSPrototypeCharacter::ServerSpawnProjectile_Validate()
+{
+	return true;
+}
+
+void AFPSPrototypeCharacter::ShowShotFX_Implementation()
+{
 	// try and play the sound if specified
 	if (FireSound != NULL)
 	{
@@ -315,14 +329,4 @@ void AFPSPrototypeCharacter::SpawnProjectile()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
-}
-
-void AFPSPrototypeCharacter::ServerSpawnProjectile_Implementation()
-{
-	SpawnProjectile();
-}
-
-bool AFPSPrototypeCharacter::ServerSpawnProjectile_Validate()
-{
-	return true;
 }

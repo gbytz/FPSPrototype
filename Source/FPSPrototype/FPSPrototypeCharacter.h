@@ -61,6 +61,13 @@ class AFPSPrototypeCharacter : public ACharacter
 	/** Called when the server tries to validate the ServerSpawnProjectile RPC */
 	bool ServerSpawnProjectile_Validate();
 
+	/** RCP called by the server to trigger shot FX*/
+	UFUNCTION(NetMulticast, Reliable)
+	void ShowShotFX();
+
+	/** Real Implementation of the ShowShotFX RPC */
+	void ShowShotFX_Implementation();
+
 public:
 
 	AFPSPrototypeCharacter();
