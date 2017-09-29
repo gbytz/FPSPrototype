@@ -5,6 +5,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "FPSPrototypeCharacter.h"
 #include "FPSPrototypeGameState.h"
+#include "FPSPrototypeGameInstance.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
@@ -124,18 +125,7 @@ void ADestructiblePiece::CountPoits(AActor* ProjectileOwner)
 	APlayerController* PlayerController = Cast<APlayerController>(ProjectileOwner);
 	if (PlayerController != nullptr)
 	{
-		PlayerController->PlayerState->Score += (float) NFibonacci(Points);
+		UFPSPrototypeGameInstance* ThisGameInstance = Cast<UFPSPrototypeGameInstance>(GetGameInstance());
+		PlayerController->PlayerState->Score += (float) ThisGameInstance->GetNthFibonacci(Points);
 	}
-}
-
-int32 ADestructiblePiece::NFibonacci(int32 n)
-{
-	int32 PreviousFib = 0;
-	int32 CurrentFib = 1;
-	for (int32 step = 0; step < n; ++step)
-	{
-		CurrentFib = CurrentFib + PreviousFib;
-		PreviousFib = CurrentFib - PreviousFib;
-	}
-	return PreviousFib;
 }

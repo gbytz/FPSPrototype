@@ -5,6 +5,7 @@
 #include "DestructiblePiece.h"
 #include "FPSPrototypeHUD.h"
 #include "FPSPrototypeGameState.h"
+#include "FPSPrototypeGameInstance.h"
 #include "Public/EngineUtils.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -44,6 +45,9 @@ void AFPSPrototypeGameMode::HandleMatchHasStarted()
 		Piece->OnRep_BaseColor(); // Change the piece material color in the server.
 		CustomGameState->SetPieceCount(CustomGameState->GetPieceCount() + 1);
 	}
+
+	UFPSPrototypeGameInstance* ThisGameInstance = Cast<UFPSPrototypeGameInstance>(GetGameInstance());
+	ThisGameInstance->InitFibonaccis(CustomGameState->GetPieceCount());
 }
 
 bool AFPSPrototypeGameMode::ReadyToEndMatch_Implementation()
