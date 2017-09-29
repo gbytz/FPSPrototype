@@ -45,24 +45,32 @@ class AFPSPrototypeCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
+	/** Called when a player wants to spawn a projectile */
 	void AttempToSpawnProjectile();
 
+	/** Spawns a projectile. Meant to be called only on the server */
 	void SpawnProjectile();
 
+	/** RPC called by the client when the player wants to spawn a projectile */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnProjectile();
 
+	/** Real Implementation of the ServerSpawnProjectile RPC */
 	void ServerSpawnProjectile_Implementation();
 
+	/** Called when the server tries to validate the ServerSpawnProjectile RPC */
 	bool ServerSpawnProjectile_Validate();
 
 public:
+
 	AFPSPrototypeCharacter();
 
-protected:
-	virtual void BeginPlay();
+	/** Returns Mesh1P subobject **/
+	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 
-public:
+	/** Returns FirstPersonCameraComponent subobject **/
+	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -92,6 +100,8 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
 protected:
+
+	virtual void BeginPlay();
 
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();
@@ -126,8 +136,7 @@ protected:
 	void EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
-	
-protected:
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
@@ -140,11 +149,6 @@ protected:
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
 
-public:
-	/** Returns Mesh1P subobject **/
-	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
-	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 };
 
